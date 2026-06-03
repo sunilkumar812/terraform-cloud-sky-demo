@@ -1,11 +1,25 @@
-#EC2 Resouce TF Configuration
+# Create S3 bucket
+resource "aws_s3_bucket" "public_bucket" {
+  bucket = "sktest-my-public-bucket-12345"
+  acl    = "public-read"   # Grants public read access
+}
 
-resource "aws_instance" "first-tf-web-server" {
-  ami           = "ami-045443a70fafb8bbc"
-  instance_type = "t3.micro"
+# Optional: Allow public access via bucket policy
+resource "aws_s3_bucket_policy" "public_bucket_policy" {
+  bucket = aws_s3_bucket.public_bucket.id
 
-  tags = {
-    Name  = "First-TF-Amazion-Linux-Server"
-    Owner = "Sunil-Kumar-DevOps-Engg"
-  }
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-public-bucket-12345/*"
+    }
+  ]
+}
+POLICY
 }
