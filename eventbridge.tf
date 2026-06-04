@@ -6,10 +6,11 @@ resource "aws_cloudwatch_event_rule" "aws_health" {
   description = "Capture AWS Health Events"
 
   event_pattern = jsonencode({
-    source = [
-      "aws.health"
-    ]
-  })
+  source = [
+    "aws.health",
+    "custom.health.test"
+  ]
+})
 }
 
 #EventBridge Target
