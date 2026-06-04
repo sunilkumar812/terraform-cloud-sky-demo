@@ -1,11 +1,35 @@
-resource "aws_cloudwatch_event_rule" "aws_health_events" {
+#EventBridge Rule
+resource "aws_cloudwatch_event_rule" "aws_health" {
 
-  name        = var.eventbridge_rule_name
-  description = var.eventbridge_rule_description
+  name = "${var.environment}-aws-health-events"
+
+  description = "Capture AWS Health Events"
 
   event_pattern = jsonencode({
     source = [
       "aws.health"
     ]
   })
+}
+
+#EventBridge Target
+resource "aws_cloudwatch_event_target" "lambda_target" {
+
+  rule = aws_cloudwatch_event_rule.aws_health.name
+
+  arn = aws_lambda_function.health_processor.arn
+}
+
+#Lambda Permission
+resource "aws_lambda_permission" "allow_eventbridge" {
+
+  statement_id = "AllowExecutionFromEventBridge"
+
+  action = "lambda:InvokeFunction"
+
+  function_name = aws_lambda_function.health_processor.function_name
+
+  principal = "events.amazonaws.com"
+
+  source_arn = aws_cloudwatch_event_rule.aws_health.arn
 }
