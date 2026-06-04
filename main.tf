@@ -28,6 +28,30 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
+# Create Policy for read tags from lambda ARN
+resource "aws_iam_role_policy" "lambda_tag_reader" {
+
+  name = "lambda-tag-reader"
+
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "lambda:ListTags",
+          "lambda:GetFunction"
+        ]
+
+        Resource = "*"
+      }
+    ]
+  })
+}
 # CloudWatch Logging Policy
 resource "aws_iam_role_policy_attachment" "basic_execution" {
 
